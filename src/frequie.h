@@ -14,8 +14,7 @@
 template<typename TI2C, uint64_t XTAL_FREQUENCY, uint64_t PLL_FREQUENCY, uint8_t DEVICE_ADDRESS, uint8_t CLOCK_COUNT> class Frequie
 {
 public:
-    Frequie(uint8_t sda_pin, uint8_t scl_pin) :
-        i2c(sda_pin, scl_pin) 
+    Frequie()
     {
         i2c.begin();
     }
@@ -26,14 +25,36 @@ public:
      * @return true if device is detected on the I2C bus
      */
     bool detect() {
-        bool result = !i2c.beginTransmission(DEVICE_ADDRESS);
-        i2c.endTransmission();
-
-        return result;
+        i2c.beginTransmission(DEVICE_ADDRESS);
+        return !i2c.endTransmission();
     }
 
     /**
-     * Initialize the Si5351 chip 
+     * Scan the I2C bus looking for connected devices
+     * 
+     * @param out the stream to write the scan results to
+     */
+    void scan_i2c_bus(Stream &out) {
+        out.println("Scanning...");
+        out.print("  0123456789ABCDEF");
+        for(int i=0; i<128; i++) {
+            i2c.beginTransmission(i);
+            bool flag = i2c.endTransmission();
+
+            if(i % 16 == 0) {
+                out.println();
+                out.print(i >> 4, 16);
+                out.print(" ");
+            }    
+            out.print(flag ? "." : "+");
+        }
+        out.println();
+    }
+
+    /**
+     * Initialize the Si5351 chip
+     * 
+     * @return true if the device could be successfully initialized
      */
     bool init() {
         uint32_t plla_p1;
@@ -67,8 +88,7 @@ public:
             // write the values for the PLLA dividers
             write_divider_registers(26, plla_p1, plla_p2, plla_p3, 0);
             
-            write_register(177, 0xA0); // reset the PLLs
-            return true;
+            return !write_register(177, 0xA0); // reset the PLLs
         }
 
         return false;
@@ -115,12 +135,10 @@ public:
     bool write_register(uint8_t reg, uint8_t value) {
         Serial.printf("reg: %d = %d\n", reg, value);
     
-        bool result = !i2c.beginTransmission(DEVICE_ADDRESS);
+        i2c.beginTransmission(DEVICE_ADDRESS);
         i2c.write(reg);
         i2c.write(value);
-        i2c.endTransmission();
-
-        return result;
+        return i2c.endTransmission();
     }
 
     /**

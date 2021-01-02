@@ -4,75 +4,72 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-#define SPEED 1
+#define SDA_HIGH() digitalWrite(SDA_PIN, HIGH)
+#define SDA_LOW() digitalWrite(SDA_PIN, LOW)
+#define SCL_HIGH() digitalWrite(SCL_PIN, HIGH)
+#define SCL_LOW() digitalWrite(SCL_PIN, LOW)
 
-#define SDA_HIGH(pin) digitalWrite(pin, HIGH)
-#define SDA_LOW(pin) digitalWrite(pin, LOW)
-#define SCL_HIGH(pin) digitalWrite(pin, HIGH)
-#define SCL_LOW(pin) digitalWrite(pin, LOW)
-
-class BBI2C
+template<uint8_t SDA_PIN, uint8_t SCL_PIN, uint8_t SPEED>class BBI2C
 {
 public:
-    BBI2C(uint8_t sda_pin, uint8_t scl_pin) :
-        sda(sda_pin), scl(scl_pin)
-    {
-
-    };
+    BBI2C() {};
 
 	void begin() {
-        pinMode(sda, OUTPUT);
-        pinMode(scl, OUTPUT);
-        digitalWrite(sda, HIGH);
-        digitalWrite(scl, HIGH); 
+        pinMode(SDA_PIN, OUTPUT);
+        pinMode(SCL_PIN, OUTPUT);
+        digitalWrite(SDA_PIN, HIGH);
+        digitalWrite(SCL_PIN, HIGH); 
         delayMicroseconds(10);       
     };
 
 	void end() {
-        pinMode(sda, INPUT);
-        pinMode(scl, INPUT);
+        pinMode(SDA_PIN, INPUT);
+        pinMode(SCL_PIN, INPUT);
     };
 
-	bool beginTransmission(uint8_t i2c_bus_addr) {
-        return _begin(i2c_bus_addr, false);
+	void beginTransmission(uint8_t i2c_bus_addr) {
+        address_ack = _begin(i2c_bus_addr, false);
     };
 
-	void endTransmission() {
+	bool endTransmission() {
         // send i2c stop condition
         delayMicroseconds(SPEED);
-        SDA_LOW(sda);
+        SDA_LOW();
         delayMicroseconds(SPEED);
-        SCL_HIGH(scl);
+        SCL_HIGH();
         delayMicroseconds(SPEED);
-        SDA_HIGH(sda);
+        SDA_HIGH();
+
+        return address_ack;
     };
 
 	bool write(uint8_t data) {        
         for(int i=0; i<8; i++) {
             if(data & 0x80) {
-                SDA_HIGH(sda);
+                SDA_HIGH();
             } else {
-                SDA_LOW(sda);
+                SDA_LOW();
             }
             delayMicroseconds(SPEED);
-            SCL_HIGH(scl);
+            SCL_HIGH();
             delayMicroseconds(SPEED);
-            SCL_LOW(scl);
+            SCL_LOW();
             delayMicroseconds(SPEED);
-            SDA_LOW(sda);
+            SDA_HIGH();
 
             data = data << 1;
         }
 
-        // now for the ACK bit
-        SCL_HIGH(scl);
+        // now read the ACK bit from the bus
+        SCL_HIGH();
         delayMicroseconds(SPEED);
-        pinMode(sda, INPUT);
-        uint8_t ack = digitalRead(sda);
-        pinMode(sda, OUTPUT);
-        SCL_LOW(scl);
+        pinMode(SDA_PIN, INPUT);
+        uint8_t ack = digitalRead(SDA_PIN);
+        pinMode(SDA_PIN, OUTPUT);
+        SDA_LOW();
+        SCL_LOW();
 
-        return ack == 1;
+        return ack == HIGH;
     };
 
 	uint8_t read(uint8_t i2c_bus_addr, bool stop) {
@@ -82,14 +79,11 @@ public:
     };
 
 private:
-    uint8_t sda;
-    uint8_t scl;
-
     bool _begin(uint8_t i2c_bus_address, bool read) {
         // i2c start condition
-        SDA_LOW(sda);
+        SDA_LOW();
         delayMicroseconds(SPEED);
-        SCL_LOW(scl);
+        SCL_LOW();
         delayMicroseconds(SPEED);
 
         uint8_t b = i2c_bus_address << 1;
@@ -102,31 +96,34 @@ private:
 
     uint8_t _read(boolean isLast) {
         uint8_t value = 0;
-        pinMode(sda, INPUT);
+        pinMode(SDA_PIN, INPUT);
         for(int i=0; i<8; i++) {
             delayMicroseconds(SPEED);
-            SCL_HIGH(scl);
+            SCL_HIGH();
             value = value << 1;
-            if(digitalRead(sda)) {
+            if(digitalRead(SDA_PIN)) {
                 value = value | 1;
             }
-            SCL_LOW(scl);
+            SCL_LOW();
         }
-        pinMode(sda, OUTPUT);
+        pinMode(SDA_PIN, OUTPUT);
 
         if(isLast) {
-            SDA_HIGH(sda);
+            SDA_HIGH();
         } else {
-            SDA_LOW(sda);
+            SDA_LOW();
         }
 
-        SCL_HIGH(scl);
+        SCL_HIGH();
         delayMicroseconds(SPEED);
-        SCL_LOW(scl);
+        SCL_LOW();
         delayMicroseconds(SPEED);
 
         return value;
     };
+
+private:
+    bool address_ack;
 };
 
 #endif

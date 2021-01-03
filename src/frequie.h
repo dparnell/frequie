@@ -9,17 +9,17 @@ Redistribution and use in source and binary forms, with or without modification,
 
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer 
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
    in the documentation and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived 
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived
    from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
-SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
@@ -44,7 +44,7 @@ public:
 
     /**
      * Determine if the Si5351 is present
-     * 
+     *
      * @return true if device is detected on the I2C bus
      */
     bool detect() {
@@ -54,7 +54,7 @@ public:
 
     /**
      * Scan the I2C bus looking for connected devices
-     * 
+     *
      * @param out the stream to write the scan results to
      */
     void scan_i2c_bus(Stream &out) {
@@ -68,7 +68,7 @@ public:
                 out.println();
                 out.print(i >> 4, 16);
                 out.print(" ");
-            }    
+            }
             out.print(flag ? "." : "+");
         }
         out.println();
@@ -76,7 +76,7 @@ public:
 
     /**
      * Initialize the Si5351 chip
-     * 
+     *
      * @return true if the device could be successfully initialized
      */
     bool init() {
@@ -110,7 +110,7 @@ public:
 
             // write the values for the PLLA dividers
             write_divider_registers(26, plla_p1, plla_p2, plla_p3, 0);
-            
+
             return !write_register(177, 0xA0); // reset the PLLs
         }
 
@@ -119,7 +119,7 @@ public:
 
     /**
      * Configure the given clock generator to produce the given frequency
-     * 
+     *
      * @param clock the zero based clock generator
      * @param frequency the desired output frequency in Hz
      */
@@ -145,7 +145,7 @@ public:
 
     /**
      * Enable the given clock generator
-     * 
+     *
      * @param clock the zero based clock generator to enable
      */
     void enable_clock(uint8_t clock) {
@@ -156,7 +156,7 @@ public:
 
     /**
      * Disable the given clovk generator
-     * 
+     *
      * @param clock the zero based clock generator to disable
      */
     void disable_clock(uint8_t clock) {
@@ -167,11 +167,11 @@ public:
 
     /**
      * write the given value to a device register
-     * 
+     *
      * @param reg the device register to write to
      * @param value the value to write to the register
      */
-    bool write_register(uint8_t reg, uint8_t value) {    
+    bool write_register(uint8_t reg, uint8_t value) {
         i2c.beginTransmission(DEVICE_ADDRESS);
         i2c.write(reg);
         i2c.write(value);
@@ -204,17 +204,17 @@ public:
 
     /**
      *  Calculate the register values for the given divider
-     * 
+     *
      * @param f1 the top frequency
      * @param f2 the bottom frequency
      * @param p1 divider register value output
      * @param p2 divider register value output
      * @param p3 divider register value output
      * @param r null if there we are calculating the register values for a PLL
-     * @param is_integer set to true if 
-     * 
+     * @param is_integer set to true if
+     *
      * @return true if the requested frequency is possible and the outputs have been updated with the calculated values
-     */ 
+     */
     bool calc_divider_params(uint64_t f1, uint64_t f2, uint32_t *p1, uint32_t *p2, uint32_t *p3, uint8_t *r, bool *is_integer)
     {
         uint64_t freq = f2;
@@ -279,7 +279,7 @@ public:
         }
 
         // now calculate the register values p1, p2 and p3
-        uint32_t fraction_term = (uint32_t)(128.0 * (double)b / (double)c);		
+        uint32_t fraction_term = (uint32_t)(128.0 * (double)b / (double)c);
 
         *p1 = 128 * a + fraction_term - 512;
         *p2 = 128 * b - c * fraction_term;

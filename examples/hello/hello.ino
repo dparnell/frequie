@@ -38,7 +38,7 @@ void setup() {
 
     while(true) {
       // STOP
-    }  
+    }
   }
 }
 

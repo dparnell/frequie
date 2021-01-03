@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#include "frequie.h"
+#include <frequie.h>
 
-#include "bbi2c.h"
+#include <bbi2c.h>
 Frequie<BBI2C<21, 22, 1>, SI5351_XTAL_25MHZ, SI5351_PLL_900MHZ, SI5351_DEVICE_ADDRESS, 3> frequie;
 
 /*
-#include "wirei2c.h"
+#include <wirei2c.h>
 Frequie<WireI2C<Wire, 21, 22, 100000>, SI5351_XTAL_25MHZ, SI5351_PLL_900MHZ, SI5351_DEVICE_ADDRESS, 3> frequie;
 */
 

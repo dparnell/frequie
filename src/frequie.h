@@ -174,7 +174,7 @@ public:
         write_register(base + 2, r_value | ((p1 >> 16) & 0x03)); // P1[17:16]
         write_register(base + 3, (p1 >> 8) & 0xff); // P1[15:8]
         write_register(base + 4, p1 & 0xff); // P1[7:0]
-        write_register(base + 5, ((p3 >> 12) & 0xf0) | ((p2 >> 16) & 0x0f)); //P3[19:16], P2[19:16]
+        write_register(base + 5, ((p3 >> 12) & 0xf0) | ((p2 >> 16) & 0x0f)); // P3[19:16], P2[19:16]
         write_register(base + 6, (p2 >> 8) & 0xff); // P2[15:8]
         write_register(base + 7, p2 & 0xff); // P2[7:0]
     }

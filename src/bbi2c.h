@@ -4,11 +4,6 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-#define SDA_HIGH() digitalWrite(SDA_PIN, HIGH)
-#define SDA_LOW() digitalWrite(SDA_PIN, LOW)
-#define SCL_HIGH() digitalWrite(SCL_PIN, HIGH)
-#define SCL_LOW() digitalWrite(SCL_PIN, LOW)
-
 template<uint8_t SDA_PIN, uint8_t SCL_PIN, uint8_t SPEED>class BBI2C
 {
 public:
@@ -34,11 +29,11 @@ public:
 	bool endTransmission() {
         // send i2c stop condition
         delayMicroseconds(SPEED);
-        SDA_LOW();
+        digitalWrite(SDA_PIN, LOW);
         delayMicroseconds(SPEED);
-        SCL_HIGH();
+        digitalWrite(SCL_PIN, HIGH);
         delayMicroseconds(SPEED);
-        SDA_HIGH();
+        digitalWrite(SDA_PIN, HIGH);
 
         return address_ack;
     };
@@ -46,28 +41,28 @@ public:
 	bool write(uint8_t data) {        
         for(int i=0; i<8; i++) {
             if(data & 0x80) {
-                SDA_HIGH();
+                digitalWrite(SDA_PIN, HIGH);
             } else {
-                SDA_LOW();
+                digitalWrite(SDA_PIN, LOW);
             }
             delayMicroseconds(SPEED);
-            SCL_HIGH();
+            digitalWrite(SCL_PIN, HIGH);
             delayMicroseconds(SPEED);
-            SCL_LOW();
+            digitalWrite(SCL_PIN, LOW);
             delayMicroseconds(SPEED);
-            SDA_HIGH();
+            digitalWrite(SDA_PIN, HIGH);
 
             data = data << 1;
         }
 
         // now read the ACK bit from the bus
-        SCL_HIGH();
+        digitalWrite(SCL_PIN, HIGH);
         delayMicroseconds(SPEED);
         pinMode(SDA_PIN, INPUT);
         uint8_t ack = digitalRead(SDA_PIN);
         pinMode(SDA_PIN, OUTPUT);
-        SDA_LOW();
-        SCL_LOW();
+        digitalWrite(SDA_PIN, LOW);
+        digitalWrite(SCL_PIN, LOW);
 
         return ack == HIGH;
     };
@@ -81,9 +76,9 @@ public:
 private:
     bool _begin(uint8_t i2c_bus_address, bool read) {
         // i2c start condition
-        SDA_LOW();
+        digitalWrite(SDA_PIN, LOW);
         delayMicroseconds(SPEED);
-        SCL_LOW();
+        digitalWrite(SCL_PIN, LOW);
         delayMicroseconds(SPEED);
 
         uint8_t b = i2c_bus_address << 1;
@@ -99,24 +94,24 @@ private:
         pinMode(SDA_PIN, INPUT);
         for(int i=0; i<8; i++) {
             delayMicroseconds(SPEED);
-            SCL_HIGH();
+            digitalWrite(SCL_PIN, HIGH);
             value = value << 1;
             if(digitalRead(SDA_PIN)) {
                 value = value | 1;
             }
-            SCL_LOW();
+            digitalWrite(SCL_PIN, LOW);
         }
         pinMode(SDA_PIN, OUTPUT);
 
         if(isLast) {
-            SDA_HIGH();
+            digitalWrite(SDA_PIN, HIGH);
         } else {
-            SDA_LOW();
+            digitalWrite(SDA_PIN, LOW);
         }
 
-        SCL_HIGH();
+        digitalWrite(SCL_PIN, HIGH);
         delayMicroseconds(SPEED);
-        SCL_LOW();
+        digitalWrite(SCL_PIN, LOW);
         delayMicroseconds(SPEED);
 
         return value;

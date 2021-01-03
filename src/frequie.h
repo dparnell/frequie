@@ -265,7 +265,6 @@ public:
         return true;
     }
 
-private:
     TI2C i2c;
 };
 

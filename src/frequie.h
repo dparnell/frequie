@@ -116,7 +116,7 @@ public:
 
     void enable_clock(uint8_t clock) {
         if(clock < CLOCK_COUNT) {
-            write_register(16 + clock, 0x43);
+            write_register(16 + clock, 0x0C);
         }
     }
 

@@ -40,33 +40,6 @@ void setup() {
       // STOP
     }  
   }
-/*
-frequie.write_register(183, 146); 
-frequie.write_register(16, 128); 
-frequie.write_register(17, 128); 
-frequie.write_register(18, 128); 
-frequie.write_register(177, 160); 
-frequie.write_register(16, 128); 
-frequie.write_register(17, 128); 
-frequie.write_register(18, 111); 
-frequie.write_register(34, 255); 
-frequie.write_register(35, 255); 
-frequie.write_register(36, 0); 
-frequie.write_register(37, 9); 
-frequie.write_register(38, 51); 
-frequie.write_register(39, 243); 
-frequie.write_register(40, 50); 
-frequie.write_register(41, 179); 
-frequie.write_register(58, 0); 
-frequie.write_register(59, 1); 
-frequie.write_register(60, 0); 
-frequie.write_register(61, 138); 
-frequie.write_register(62, 0); 
-frequie.write_register(63, 0); 
-frequie.write_register(64, 0); 
-frequie.write_register(65, 0); 
-frequie.write_register(177, 128); 
-*/
 }
 
 void loop() {

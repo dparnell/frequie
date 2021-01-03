@@ -155,7 +155,7 @@ public:
     }
 
     /**
-     * Disable the given clovk generator
+     * Disable the given clock generator
      *
      * @param clock the zero based clock generator to disable
      */

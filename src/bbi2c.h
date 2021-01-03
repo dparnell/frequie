@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-template<uint8_t SDA_PIN, uint8_t SCL_PIN, uint8_t SPEED>class BBI2C
+template<uint8_t SDA_PIN, uint8_t SCL_PIN, uint8_t CLOCK_DELAY>class BBI2C
 {
 public:
     BBI2C() {};
@@ -28,11 +28,11 @@ public:
 
 	bool endTransmission() {
         // send i2c stop condition
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
         digitalWrite(SDA_PIN, LOW);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
         digitalWrite(SCL_PIN, HIGH);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
         digitalWrite(SDA_PIN, HIGH);
 
         return address_ack;
@@ -45,11 +45,11 @@ public:
             } else {
                 digitalWrite(SDA_PIN, LOW);
             }
-            delayMicroseconds(SPEED);
+            delayMicroseconds(CLOCK_DELAY);
             digitalWrite(SCL_PIN, HIGH);
-            delayMicroseconds(SPEED);
+            delayMicroseconds(CLOCK_DELAY);
             digitalWrite(SCL_PIN, LOW);
-            delayMicroseconds(SPEED);
+            delayMicroseconds(CLOCK_DELAY);
             digitalWrite(SDA_PIN, HIGH);
 
             data = data << 1;
@@ -57,7 +57,7 @@ public:
 
         // now read the ACK bit from the bus
         digitalWrite(SCL_PIN, HIGH);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
         pinMode(SDA_PIN, INPUT);
         uint8_t ack = digitalRead(SDA_PIN);
         pinMode(SDA_PIN, OUTPUT);
@@ -77,9 +77,9 @@ private:
     bool _begin(uint8_t i2c_bus_address, bool read) {
         // i2c start condition
         digitalWrite(SDA_PIN, LOW);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
         digitalWrite(SCL_PIN, LOW);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
 
         uint8_t b = i2c_bus_address << 1;
         if(read) {
@@ -93,7 +93,7 @@ private:
         uint8_t value = 0;
         pinMode(SDA_PIN, INPUT);
         for(int i=0; i<8; i++) {
-            delayMicroseconds(SPEED);
+            delayMicroseconds(CLOCK_DELAY);
             digitalWrite(SCL_PIN, HIGH);
             value = value << 1;
             if(digitalRead(SDA_PIN)) {
@@ -110,9 +110,9 @@ private:
         }
 
         digitalWrite(SCL_PIN, HIGH);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
         digitalWrite(SCL_PIN, LOW);
-        delayMicroseconds(SPEED);
+        delayMicroseconds(CLOCK_DELAY);
 
         return value;
     };

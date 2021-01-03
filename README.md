@@ -20,7 +20,7 @@ The library ships with two I2C interfaces. The first uses Wire while the second 
 #include <wirei2c.h>
 
 /**
- * Create an instance of Frequie that us using Wire to talk to the Si5351 chip with SDA on pin 21, SCL on pin 22 and a transfer rate of 100kHz,
+ * Create an instance of Frequie using Wire to talk to the Si5351 chip with SDA on pin 21, SCL on pin 22 and a transfer rate of 100kHz,
  * crystal reference of 25MHz, PLLA frequency of 900 MHz, using the standard Si5351 device address and finally having only 3 clock generators.
  */
 Frequie<WireI2C<Wire, 21, 22, 100000>, SI5351_XTAL_25MHZ, SI5351_PLL_900MHZ, SI5351_DEVICE_ADDRESS, 3> frequie;

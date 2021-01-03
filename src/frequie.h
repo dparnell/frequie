@@ -94,6 +94,12 @@ public:
         return false;
     }
 
+    /**
+     * Configure the given clock generator to produce the given frequency
+     * 
+     * @param clock the zero based clock generator
+     * @param frequency the desired output frequency in Hz
+     */
     bool set_clock_frequency(uint8_t clock, uint64_t frequency) {
         uint32_t p1;
         uint32_t p2;
@@ -114,12 +120,22 @@ public:
         return false;
     }
 
+    /**
+     * Enable the given clock generator
+     * 
+     * @param clock the zero based clock generator to enable
+     */
     void enable_clock(uint8_t clock) {
         if(clock < CLOCK_COUNT) {
             write_register(16 + clock, 0x0C);
         }
     }
 
+    /**
+     * Disable the given clovk generator
+     * 
+     * @param clock the zero based clock generator to disable
+     */
     void disable_clock(uint8_t clock) {
         if(clock < CLOCK_COUNT) {
             write_register(16 + clock, 0x80);
@@ -132,9 +148,7 @@ public:
      * @param reg the device register to write to
      * @param value the value to write to the register
      */
-    bool write_register(uint8_t reg, uint8_t value) {
-        Serial.printf("reg: %d = %d\n", reg, value);
-    
+    bool write_register(uint8_t reg, uint8_t value) {    
         i2c.beginTransmission(DEVICE_ADDRESS);
         i2c.write(reg);
         i2c.write(value);

@@ -225,7 +225,7 @@ public:
             // we are calculating the divider for the PLL so there is no extra dividers
 
             if(nTmp < 15 || nTmp > 90) {
-                // this valid is outside the allowed range
+                // this value is outside the allowed range
                 return false;
             }
         } else {

@@ -36,10 +36,30 @@ OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISE
 
 template<typename TI2C, uint64_t XTAL_FREQUENCY, uint64_t PLL_FREQUENCY, uint8_t DEVICE_ADDRESS, uint8_t CLOCK_COUNT> class Frequie
 {
+private:
+    int32_t calibration_offset;
 public:
-    Frequie()
+    Frequie(int32_t correction = 0)
     {
         i2c.begin();
+    }
+
+    /**
+     *  Given the crystal error in parts per billion set the calibration offset
+     * 
+     *  @param correction the crystal error
+     */
+    void set_correction(int32_t correction) {
+        calibration_offset = (int32_t)((((((int64_t)correction) << 31) / 1000000000LL) * XTAL_FREQUENCY) >> 31);        
+    }
+
+    /**
+     *  Fetch the calibration offset
+     * 
+     *  @return the calibration offset
+     */
+    int32_t get_correction() {
+        return calibration_offset;
     }
 
     /**
@@ -85,7 +105,7 @@ public:
         uint32_t plla_p3;
         bool integer_div;
 
-        if(calc_divider_params(PLL_FREQUENCY, XTAL_FREQUENCY, &plla_p1, &plla_p2, &plla_p3, NULL, &integer_div)) {
+        if(calc_divider_params(PLL_FREQUENCY, XTAL_FREQUENCY + calibration_offset, &plla_p1, &plla_p2, &plla_p3, NULL, &integer_div)) {
             i2c.begin();
             write_register(183, 0x92);  // 8pf caps
 

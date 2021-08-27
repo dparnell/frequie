@@ -2,7 +2,7 @@
 #include <frequie.h>
 
 #include <bbi2c.h>
-Frequie<BBI2C<21, 22, 1>, SI5351_XTAL_25MHZ, SI5351_PLL_900MHZ, SI5351_DEVICE_ADDRESS, 3> frequie;
+Frequie<BBI2C<14, 15, 1>, SI5351_XTAL_25MHZ, SI5351_PLL_900MHZ, SI5351_DEVICE_ADDRESS, 3> frequie;
 
 /*
 #include <wirei2c.h>
@@ -13,6 +13,8 @@ void setup() {
   Serial.begin(9600);
 
   Serial.println("BOOTED");
+
+  // frequie.set_correction(1234567);
 
   frequie.scan_i2c_bus(Serial);
 
@@ -47,4 +49,8 @@ void loop() {
     frequie.set_clock_frequency(0, 1000000);
     frequie.enable_clock(0);
   */
+  Serial.print("The clocks are running: offset = ");
+  Serial.println(frequie.get_correction());
+  
+  delay(1000);
 }

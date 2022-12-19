@@ -46,6 +46,7 @@ public:
 
     /**
      *  Given the crystal error in parts per billion set the calibration offset
+     *  If this is called after init it is necessary to call update_pll_divider to actually apply the correction factor
      * 
      *  @param correction the crystal error
      */
@@ -137,6 +138,9 @@ public:
         return false;
     }
 
+    /**
+     * Update the PLL dividers to take an updated calibration factor into account
+    */
     void update_pll_divider() {
         uint32_t plla_p1;
         uint32_t plla_p2;

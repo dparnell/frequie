@@ -137,6 +137,21 @@ public:
         return false;
     }
 
+    void update_pll_divider() {
+        uint32_t plla_p1;
+        uint32_t plla_p2;
+        uint32_t plla_p3;
+        bool integer_div;
+
+        if(calc_divider_params(PLL_FREQUENCY, XTAL_FREQUENCY + calibration_offset, &plla_p1, &plla_p2, &plla_p3, NULL, &integer_div)) {
+            // write the values for the PLLA dividers
+            write_divider_registers(26, plla_p1, plla_p2, plla_p3, 0);
+
+            write_register(177, 0xA0); // reset the PLLs
+        }
+
+    }
+
     /**
      * Configure the given clock generator to produce the given frequency
      *

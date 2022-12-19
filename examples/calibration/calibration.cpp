@@ -20,21 +20,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <Arduino.h>
 #include <frequie.h>
 #include <bbi2c.h>
 
+  // The crystal load value needs to match in order to have an accurate calibration
 Frequie<BBI2C<14, 15, 1>, SI5351_XTAL_25MHZ, SI5351_PLL_900MHZ, SI5351_DEVICE_ADDRESS, 3> si5351;
 
 int32_t cal_factor = 0;
 int32_t old_cal = 0;
 
 uint64_t rx_freq;
-const uint64_t target_freq = 1000000000ULL; // 10 MHz, in hundredths of hertz
+const uint64_t target_freq = 10000000ULL; // 10 MHz
 
 void setup()
 {
   // Start serial and initialize the Si5351
-  Serial.begin(57600);
+  Serial.begin(9600);
 
   si5351.scan_i2c_bus(Serial);
 
@@ -44,20 +46,11 @@ void setup()
     si5351.scan_i2c_bus(Serial);
   }
 
-  // The crystal load value needs to match in order to have an accurate calibration
-  // si5351.init(SI5351_CRYSTAL_LOAD_8PF, 0, 0);
-
+  si5351.init();
   // Start on target frequency
   si5351.set_correction(cal_factor);
-  si5351.set_clock_frequency(0, target_freq / 100);
-}
-
-void loop()
-{
-  Serial.println();
-  Serial.println(F("Adjust until your frequency counter reads as close to 10 MHz as possible."));
-  Serial.println(F("Press 'q' when complete."));
-  vfo_interface();
+  si5351.set_clock_frequency(0, target_freq);
+  si5351.enable_clock(0);
 }
 
 static void flush_input(void)
@@ -88,7 +81,7 @@ static void vfo_interface(void)
         Serial.println(F("Setting calibration factor"));
         si5351.set_correction(cal_factor);
         Serial.println(F("Resetting target frequency"));
-        si5351.set_clock_frequency(0, target_freq / 100);
+        si5351.set_clock_frequency(0, target_freq);
         old_cal = cal_factor;
         return;
       case 'r': rx_freq += 1; break;
@@ -112,9 +105,18 @@ static void vfo_interface(void)
 
     cal_factor = (int32_t)(target_freq - rx_freq) + old_cal;
     si5351.set_correction(cal_factor);
+    si5351.update_pll_divider();
     si5351.set_clock_frequency(0, target_freq);
     Serial.print(F("Current difference:"));
     Serial.println(cal_factor);
     }
   }
+}
+
+void loop()
+{
+  Serial.println();
+  Serial.println(F("Adjust until your frequency counter reads as close to 10 MHz as possible."));
+  Serial.println(F("Press 'q' when complete."));
+  vfo_interface();
 }

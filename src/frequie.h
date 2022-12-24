@@ -318,7 +318,7 @@ public:
         }
 
         // now calculate the register values p1, p2 and p3
-        uint32_t fraction_term = (uint32_t)(128.0 * ((((int64_t)b << 31) / c) >> 31));
+        uint32_t fraction_term = (uint32_t)(128 * ((((int64_t)b << 31) / c) >> 31));
 
         *p1 = 128 * a + fraction_term - 512;
         *p2 = 128 * b - c * fraction_term;

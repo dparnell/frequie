@@ -257,7 +257,7 @@ public:
     bool calc_divider_params(uint64_t f1, uint64_t f2, uint32_t *p1, uint32_t *p2, uint32_t *p3, uint8_t *r, bool *is_integer)
     {
         uint64_t freq = f2;
-        double nTmp = (double)f1 / (double)freq;
+        uint64_t nTmp = ((f1 << 31) / freq) >> 31;
         uint8_t rTmp = 0;
 
         if(!r) {
@@ -273,7 +273,7 @@ public:
                 rTmp = rTmp + 1;
                 freq = freq * 2;
 
-                nTmp = (double)f1 / (double)freq;
+                nTmp = ((f1 << 31) / freq) >> 31;
             }
 
             if(rTmp > 7) {
@@ -318,7 +318,7 @@ public:
         }
 
         // now calculate the register values p1, p2 and p3
-        uint32_t fraction_term = (uint32_t)(128.0 * (double)b / (double)c);
+        uint32_t fraction_term = (uint32_t)(128.0 * ((((int64_t)b << 31) / c) >> 31));
 
         *p1 = 128 * a + fraction_term - 512;
         *p2 = 128 * b - c * fraction_term;
